@@ -1,6 +1,7 @@
-import express from 'express'
-import path from 'path'
+import express from 'express';
+import path from 'path';
 import { fileURLToPath } from 'url';
+import Course from './models/course.mjs';
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);

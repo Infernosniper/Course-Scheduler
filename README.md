@@ -1,117 +1,93 @@
-The content below is an example project proposal / requirements document. Replace the text below the lines marked "__TODO__" with details specific to your project. Remove the "TODO" lines.
-
-(__TODO__: your project name)
-
-# Shoppy Shoperson 
+# Course Schedule Designer
 
 ## Overview
 
-(__TODO__: a brief one or two paragraph, high-level description of your project)
+Keeping track of the myriad of courses you want to take, their offered times, and the ratings of professors can be a massive hassle. If you're like me, this involves spreadsheets, lists, and hours of frustration.
 
-Remembering what to buy at the grocery store is waaaaay too difficult. Also, shopping for groceries when you're hungry leads to regrettable purchases. Sooo... that's where Shoppy Shoperson comes in!
+The goal of this web app is to track what classes you have an interest in, and offer a set of schedules based on the selected coureses. 
 
-Shoppy Shoperson is a web app that will allow users to keep track of multiple grocery lists. Users can register and login. Once they're logged in, they can create or view their grocery list. For every list that they have, they can add items to the list or cross off items.
-
+Users can register and login. Once logged in, the courses they have chosen will be displayed, with the options to add and remove courses, assign priority (I.E., if you must take a course, flag it as so), and generate potential schedules.
 
 ## Data Model
 
-(__TODO__: a description of your application's data and their relationships to each other) 
+The application will store Users, Courses, scheduled times, and Professors
 
-The application will store Users, Lists and Items
-
-* users can have multiple lists (via references)
-* each list can have multiple items (by embedding)
-
-(__TODO__: sample documents)
+* users can have many courses (via reference)
+* courses can have multiple time blocks (by embedding)
+* courses can have multiple proessors (by reference)
 
 An Example User:
 
 ```javascript
 {
-  username: "shannonshopper",
+  username: "michael",
   hash: // a password hash,
-  lists: // an array of references to List documents
+  courses: // an array of references to Course documents
 }
 ```
 
-An Example List with Embedded Items:
+An Example Course with Embedded Items:
 
 ```javascript
 {
-  user: // a reference to a User object
-  name: "Breakfast foods",
-  items: [
-    { name: "pancakes", quantity: "9876", checked: false},
-    { name: "ramen", quantity: "2", checked: true},
-  ],
-  createdAt: // timestamp
+  courseName: "Applied Internet Technology",
+  courseNumber: "CSCI-UA 0467",
+  scheduledTimes: [
+      {day: "Monday", time: "0930-1045"},
+      {day: "Wednesday", time: "0930-1045"}
+    ],
+  Professors: [
+      {name: "Versoza", rating: 3.5}
+    ]
 }
 ```
 
-
-## [Link to Commented First Draft Schema](db.mjs) 
-
-(__TODO__: create a first draft of your Schemas in db.mjs and link to it)
+## [Link to Commented First Draft Schema](models/course.mjs) 
 
 ## Wireframes
 
-(__TODO__: wireframes for all of the pages on your site; they can be as simple as photos of drawings or you can use a tool like Balsamiq, Omnigraffle, etc.)
+/courses/add - page for creating a new shopping list
 
-/list/create - page for creating a new shopping list
+![list create](documentation/add-course.jpeg)
 
-![list create](documentation/list-create.png)
+/courses - page for showing all courses
 
-/list - page for showing all shopping lists
+![list](documentation/view-courses.jpeg)
 
-![list](documentation/list.png)
+/courses/remove - page for selecting course to remove
 
-/list/slug - page for showing specific shopping list
+![list](documentation/remove-course.jpeg)
 
-![list](documentation/list-slug.png)
+## Site Map
 
-## Site map
-
-(__TODO__: draw out a site map that shows how pages are related to each other)
-
-Here's a [complex example from wikipedia](https://upload.wikimedia.org/wikipedia/commons/2/20/Sitemap_google.jpg), but you can create one without the screenshots, drop shadows, etc. ... just names of pages and where they flow to.
+![Site map](documentation/site-map.jpeg)
 
 ## User Stories or Use Cases
 
-(__TODO__: write out how your application will be used through [user stories](http://en.wikipedia.org/wiki/User_story#Format) and / or [use cases](https://en.wikipedia.org/wiki/Use_case))
-
 1. as non-registered user, I can register a new account with the site
 2. as a user, I can log in to the site
-3. as a user, I can create a new grocery list
-4. as a user, I can view all of the grocery lists I've created in a single list
-5. as a user, I can add items to an existing grocery list
-6. as a user, I can cross off items in an existing grocery list
+3. as a user, I can view currently added courses
+4. as a user, I can add courses to the registry
+5. as a user, I can remove courses from the registry
+6. as a user, I can assign priority to courses
+7. as a user, I can generate potential schedules based on selected courses
+8. as a user, I can export generated schedules
 
 ## Research Topics
 
-(__TODO__: the research topics that you're planning on working on along with their point values... and the total points of research topics listed)
-
 * (5 points) Integrate user authentication
     * I'm going to be using passport for user authentication
-    * And account has been made for testing; I'll email you the password
-    * see <code>cs.nyu.edu/~jversoza/ait-final/register</code> for register page
-    * see <code>cs.nyu.edu/~jversoza/ait-final/login</code> for login page
 * (4 points) Perform client side form validation using a JavaScript library
-    * see <code>cs.nyu.edu/~jversoza/ait-final/my-form</code>
-    * if you put in a number that's greater than 5, an error message will appear in the dom
-* (5 points) vue.js
-    * used vue.js as the frontend framework; it's a challenging library to learn, so I've assigned it 5 points
+    * If you put in a number that's in an invalid format (such as bad time slot format, bad course name format), a message will appear in the DOM
+* (1 point) Use Bootstrap as a CSS Framework
+    * Will configure a theme using Bootstrap to make the website hurt the user's brain a little bit less
+* (5 points) NYU Course System API
+    * This one is a long shot for if I happen to get the rest of the project done
+    * Addition of this feature would support adding courses to registry via the NYU Course ID, and the necessary data fields would be pulled from the NYU Course System API
 
-10 points total out of 8 required points (___TODO__: addtional points will __not__ count for extra credit)
-
+15 points total out of 10 required points
 
 ## [Link to Initial Main Project File](app.mjs) 
 
-(__TODO__: create a skeleton Express application with a package.json, app.mjs, views folder, etc. ... and link to your initial app.mjs)
-
-## Annotations / References Used
-
-(__TODO__: list any tutorials/references/etc. that you've based your code off of)
-
-1. [passport.js authentication docs](http://passportjs.org/docs) - (add link to source code that was based on this)
-2. [tutorial on vue.js](https://vuejs.org/v2/guide/) - (add link to source code that was based on this)
+## Annotations / References Used - Currently none
 
