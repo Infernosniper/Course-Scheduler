@@ -30,14 +30,15 @@ An Example Course with Embedded Items:
 
 ```javascript
 {
-  courseName: "Applied Internet Technology",
-  courseNumber: "CSCI-UA 0467",
-  scheduledTimes: [
-      {day: "Monday", time: "0930-1045"},
-      {day: "Wednesday", time: "0930-1045"}
+    courseNumber: "CSCI-UA 0467",
+    courseName: "Applied Internet Technology",
+    credits: 4,
+    scheduledTimes: [
+        {day: "Monday", start: "0930", end: "1045"},
+        {day: "Wednesday", start: "0930", end: "1045"}
     ],
-  Professors: [
-      {name: "Versoza", rating: 3.5}
+    Professors: [
+        {first: "Joe", last: "Versoza", rating: 3.5}
     ]
 }
 ```
