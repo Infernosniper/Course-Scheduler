@@ -3,6 +3,7 @@ import path from 'path';
 import mongoose from 'mongoose';
 import { fileURLToPath } from 'url';
 import './models/course.mjs';
+import { makeTimeTable } from './courseConstruction.mjs';
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -10,12 +11,10 @@ const __dirname = path.dirname(__filename);
 
 const Course = mongoose.model('Course');
 
-const testSet = [];
-for(let i = 0; i < 20; i++) testSet.push({ courseName: 'a', courseNumber: `XXXX ${i}`, scheduledTimes: 'Mon 0930-1045, Wed 0930-1045', professors: [{ name: `px-${i}`, rating: Math.round(Math.random() * 5 * 10) / 10 }] });
-
 app.set('view engine', 'hbs');
 app.listen(process.env.PORT || 3000);
 
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended:false }));
 
 app.get('/', (req, res) => {
@@ -31,7 +30,11 @@ app.get('/courses/add', (req, res) => {
 	res.render('add-course');
 });
 
-// TODO
+app.get('/courses/schedules', async (req, res) => {
+	const timeTable = makeTimeTable(await Course.find());
+	res.render('schedules', { timeTable });
+});
+
 app.post('/courses/add', async (req, res) => {
 	try{
 		const scheduledTimes = req.body.scheduledTimes.split(', ').map(time => {
@@ -73,6 +76,7 @@ app.post('/courses/add', async (req, res) => {
 			credits: +req.body.credits,
 			scheduledTimes,
 			professors,
+			color: (req.body.color === '#000000') ? `#${Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, 0).toUpperCase()}` : req.body.color,
 		};
 
 		const newCourse = new Course(newCourseData);
@@ -81,11 +85,9 @@ app.post('/courses/add', async (req, res) => {
 	}catch(err){
 		res.status(400).send('Invalid Input! Field missing or format was bad!');
 	}
-
 });
 
 app.post('/courses/remove', async (req, res) => {
-	const [courseNumber, courseName] = req.body.courseToRemove.split(': ');
-	await Course.deleteOne({ courseNumber, courseName });
+	await Course.deleteOne({ _id: req.body.courseToRemove });
 	res.redirect('/courses');
 });

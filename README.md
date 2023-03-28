@@ -90,5 +90,7 @@ An Example Course with Embedded Items:
 
 ## [Link to Initial Main Project File](app.mjs) 
 
-## Annotations / References Used - Currently none
+## Annotations / References Used
+
+1. [Bootstrap documentation: my best friend](https://getbootstrap.com/docs/5.3/getting-started/introduction/) - [course-list.hbs](views/course-list.hbs), [add-course.hbs](views/add-course.hbs),  [schedules.hbs](views/schedules.hbs) 
 

@@ -1,0 +1,35 @@
+<div class="container-fluid">
+	<table class="table table-borderless">
+		<thead>
+			<tr>	
+				<th scope="col" class="col-sm"></th>
+				<th scope="col" class="col-sm-2 text-center" scope="row">Sunday</th>
+				<th scope="col" class="col-sm-2 text-center" scope="row">Monday</th>
+				<th scope="col" class="col-sm-2 text-center" scope="row">Tuesday</th>
+				<th scope="col" class="col-sm-2 text-center" scope="row">Wednesday</th>
+				<th scope="col" class="col-sm-2 text-center" scope="row">Thursday</th>
+				<th scope="col" class="col-sm-2 text-center" scope="row">Friday</th>
+				<th scope="col" class="col-sm-2 text-center" scope="row">Saturday</th>
+			</tr>
+		</thead>
+		<tbody>
+			{{#each timeTable}}
+				<tr>
+					{{#if newRow}}
+						<th scope="row" class="border-top" rowspan="6">{{timeStr}}</th>
+					{{/if}}
+					{{#unless newRow}}
+					{{/unless}}
+					{{#each coursesAtTime}}
+						{{#if numBlocks}}
+							<td class="text-center"style= "background-color:{{color}}55; font-weight:bold;" rowspan="{{numBlocks}}">{{courseNumber}}<br>{{courseName}}<br><span style="font-weight:normal;">{{#each professors}}{{last}}<br>{{/each}}</span></td>
+						{{/if}}
+						{{#unless numBlocks}}
+						<td></td>
+						{{/unless}}
+					{{/each}}
+				</tr>
+			{{/each}}
+		</tbody>
+	</table>
+</div>
