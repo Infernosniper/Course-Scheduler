@@ -48,7 +48,9 @@ const makeTimeTable = (courses) => {
 				color: course.color,
 			};
 
-			timeTable[timeTable.findIndex((t) => t.timeStr.split(':').join('') === time.start)].coursesAtTime[convertDayToIndex(time.day)] = reformattedCourse;
+			const startIndex = timeTable.findIndex((t) => t.timeStr.split(':').join('') === time.start);
+			timeTable[startIndex].coursesAtTime[convertDayToIndex(time.day)] = reformattedCourse;
+			for(let i = 1; i < numBlocks; i++) timeTable[startIndex + i].coursesAtTime[convertDayToIndex(time.day)].spannedOver = true;
 		}
 	}
 	return timeTable;
