@@ -3,7 +3,7 @@ import path from 'path';
 import mongoose from 'mongoose';
 import { fileURLToPath } from 'url';
 import './models/course.mjs';
-import { makeTimeTable } from './courseConstruction.mjs';
+import { makeTimeTable, makeNonconflictingSchedules } from './courseConstruction.mjs';
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -76,6 +76,7 @@ app.post('/courses/add', async (req, res) => {
 			credits: +req.body.credits,
 			scheduledTimes,
 			professors,
+			mandatory: req.body.mandatory === 'on' ? true : false,
 			color: (req.body.color === '#000000') ? `#${Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, 0).toUpperCase()}` : req.body.color,
 		};
 
@@ -88,6 +89,6 @@ app.post('/courses/add', async (req, res) => {
 });
 
 app.post('/courses/remove', async (req, res) => {
-	await Course.deleteOne({ _id: req.body.courseToRemove });
+	if(req.body.courseToRemove !== '') await Course.deleteOne({ _id: req.body.courseToRemove });
 	res.redirect('/courses');
 });

@@ -56,6 +56,62 @@ const makeTimeTable = (courses) => {
 	return timeTable;
 };
 
+const isOverlap = (courseA, schedule) => {
+	for(const courseB of schedule){
+		for(let i = 0; i < courseA.scheduledTimes.length; i++){
+			if(courseB.scheduledTimes[i] === undefined) break;
+
+			const [dayA, dayB] = [courseA.scheduledTimes[i].day, courseB.scheduledTimes[i].day];
+			const [startA, endA] = [+courseA.scheduledTimes[i].start, +courseA.scheduledTimes[i].end];
+			const [startB, endB] = [+courseB.scheduledTimes[i].start, +courseB.scheduledTimes[i].end];
+
+			if(dayA !== dayB) continue;
+			if(startA <= endB && startB <= endA) return true;
+		}
+	}
+
+	return false;
+};
+
+const recMakeNonconflictingSchedules = (unusedCourses, schedule = []) => {
+	schedule = schedule.sort((a, b) => a._id.valueOf().localeCompare(b._id.valueOf()));
+	if(unusedCourses.length === 0) return [];
+	const validSchedules = [];
+
+	if(schedule.length > 0){
+		const [newCourse, ...existingSchedule] = [schedule[0], ...schedule.slice(1)];
+		if(isOverlap(newCourse, existingSchedule)) return [];
+		else validSchedules.push(schedule);
+	}
+
+	for(let i = 0; i < unusedCourses.length; i++){
+		const nestedValidSchedules = recMakeNonconflictingSchedules([...unusedCourses.slice(0, i), ...unusedCourses.slice(i + 1)], [unusedCourses[i], ...schedule]);
+		if(nestedValidSchedules.length > 0) validSchedules.push(...nestedValidSchedules);
+	}
+
+	return validSchedules;
+};
+
+const makeNonconflictingSchedules = (courses, minCredits = 12, maxCredits = 18) => {
+	let potentialSchedules = recMakeNonconflictingSchedules(courses);
+
+	// removes duplicates
+	const stringified = potentialSchedules.map(JSON.stringify);
+	const uniqueStringArray = new Set(stringified);
+	potentialSchedules = Array.from(uniqueStringArray, JSON.parse);
+
+	// removes schedules outside of desired credits range
+	return potentialSchedules.filter((schedule) => {
+		const numCredits = schedule.reduce((acc, course) => {
+			acc += course.credits;
+			return acc;
+		}, 0);
+
+		return numCredits >= minCredits && numCredits <= maxCredits;
+	});
+};
+
 export {
 	makeTimeTable,
+	makeNonconflictingSchedules,
 };

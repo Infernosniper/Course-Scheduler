@@ -13,8 +13,8 @@ await mongoose.connect('mongodb://localhost/final-project', mongooseOpts)
 // scheduledTime contains the day of week, start time, and end time
 const scheduledTimeSchema = new Schema({
 	day: { type: String, enum: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], required: true },
-	start: { type: String, required: true },
-	end: { type: String, required: true },
+	start: { type: String, required: true, minLength: 4, maxLength: 4 },
+	end: { type: String, required: true, minLength: 4, maxLength: 4 },
 });
 
 // professor contains first optional first name, last name, optional RMP rating
@@ -39,6 +39,7 @@ const courseSchema = new Schema({
 	},
 	scheduledTimes: { type: [scheduledTimeSchema], required: true },
 	professors: { type: [professorsSchema], required: true },
+	mandatory: { type: Boolean, required: true },
 	color: { type: String, required: true },
 });
 
