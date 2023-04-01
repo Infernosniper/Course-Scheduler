@@ -3,7 +3,7 @@
 // Splits 'HHMM' into [Hour, Min];
 const splitTime = (time) => [+time.substring(0, 2), +time.substring(2, 4)];
 
-//
+// Converts Sun-Sat to 0-6
 const convertDayToIndex = (day) => {
 	const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 	return days.indexOf(day);
@@ -13,6 +13,7 @@ const convertDayToIndex = (day) => {
 const makeTimeTable = (courses) => {
 	const timeTable = [];
 
+	// determines earliest and latest course hour for table range
 	const [earliest, latest] = courses.reduce((acc, curCourse) => {
 		const [courseEarliest, courseLatest] = curCourse.scheduledTimes.reduce((innerAcc, time) => {
 			if(splitTime(time.start)[0] < innerAcc[0]) innerAcc[0] = splitTime(time.start)[0];
@@ -24,6 +25,7 @@ const makeTimeTable = (courses) => {
 		return acc;
 	}, [23, 0]);
 
+	// creates table of 5 minute intervals in above range
 	for(let hour = earliest; hour <= latest; hour++){
 		for(let min = 0; min < 60; min += 5){
 			timeTable.push({
@@ -34,6 +36,7 @@ const makeTimeTable = (courses) => {
 		}
 	}
 
+	// for each course time, add it to the correct time slot in the time table
 	for (const course of courses){
 		for(const time of course.scheduledTimes){
 			const [startHour, startMin] = splitTime(time.start);
@@ -53,20 +56,21 @@ const makeTimeTable = (courses) => {
 			for(let i = 1; i < numBlocks; i++) timeTable[startIndex + i].coursesAtTime[convertDayToIndex(time.day)].spannedOver = true;
 		}
 	}
+
 	return timeTable;
 };
 
-const isOverlap = (courseA, schedule) => {
-	for(const courseB of schedule){
-		for(let i = 0; i < courseA.scheduledTimes.length; i++){
-			if(courseB.scheduledTimes[i] === undefined) break;
-
-			const [dayA, dayB] = [courseA.scheduledTimes[i].day, courseB.scheduledTimes[i].day];
-			const [startA, endA] = [+courseA.scheduledTimes[i].start, +courseA.scheduledTimes[i].end];
-			const [startB, endB] = [+courseB.scheduledTimes[i].start, +courseB.scheduledTimes[i].end];
-
-			if(dayA !== dayB) continue;
-			if(startA <= endB && startB <= endA) return true;
+// checks if time overlap between any courses in a potential schedule
+const isOverlap = (schedule) => {
+	for(const courseA of schedule){
+		for(const courseB of schedule){
+			if(courseA._id.valueOf() !== courseB._id.valueOf()){
+				for(const timeA of courseA.scheduledTimes){
+					for(const timeB of courseB.scheduledTimes){
+						if(timeA.day === timeB.day && timeA.start <= timeB.end && timeB.start <= timeA.end) return true;
+					}
+				}
+			}
 		}
 	}
 
@@ -75,15 +79,15 @@ const isOverlap = (courseA, schedule) => {
 
 const recMakeNonconflictingSchedules = (unusedCourses, schedule = []) => {
 	schedule = schedule.sort((a, b) => a._id.valueOf().localeCompare(b._id.valueOf()));
-	if(unusedCourses.length === 0) return [];
 	const validSchedules = [];
 
+	// validates current schedule
 	if(schedule.length > 0){
-		const [newCourse, ...existingSchedule] = [schedule[0], ...schedule.slice(1)];
-		if(isOverlap(newCourse, existingSchedule)) return [];
+		if(isOverlap(schedule)) return [];
 		else validSchedules.push(schedule);
 	}
 
+	// generates possible next schedules
 	for(let i = 0; i < unusedCourses.length; i++){
 		const nestedValidSchedules = recMakeNonconflictingSchedules([...unusedCourses.slice(0, i), ...unusedCourses.slice(i + 1)], [unusedCourses[i], ...schedule]);
 		if(nestedValidSchedules.length > 0) validSchedules.push(...nestedValidSchedules);
@@ -92,7 +96,7 @@ const recMakeNonconflictingSchedules = (unusedCourses, schedule = []) => {
 	return validSchedules;
 };
 
-const makeNonconflictingSchedules = (courses, minCredits = 12, maxCredits = 18) => {
+const makeNonconflictingSchedules = (courses, method, params) => {
 	let potentialSchedules = recMakeNonconflictingSchedules(courses);
 
 	// removes duplicates
@@ -100,15 +104,21 @@ const makeNonconflictingSchedules = (courses, minCredits = 12, maxCredits = 18) 
 	const uniqueStringArray = new Set(stringified);
 	potentialSchedules = Array.from(uniqueStringArray, JSON.parse);
 
-	// removes schedules outside of desired credits range
-	return potentialSchedules.filter((schedule) => {
-		const numCredits = schedule.reduce((acc, course) => {
-			acc += course.credits;
-			return acc;
-		}, 0);
+	// removes schedules outside of desired params (either via num credits or num courses)
+	if(method === 'credits'){
+		const [minCredits, maxCredits] = params;
+		return potentialSchedules.filter((schedule) => {
+			const numCredits = schedule.reduce((acc, course) => {
+				acc += course.credits;
+				return acc;
+			}, 0);
 
-		return numCredits >= minCredits && numCredits <= maxCredits;
-	});
+			return numCredits >= minCredits && numCredits <= maxCredits;
+		});
+	}else if(method === 'courses'){
+		const numCourses = params[0];
+		return potentialSchedules.filter((schedule) => schedule.length === numCourses);
+	}
 };
 
 export {

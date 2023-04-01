@@ -5,6 +5,7 @@
 			<tr>
 				<th>Course Number</th>
 				<th>Course Name</th>
+				<th>Credits</th>
 				<th>Scheduled Times</th>
 				<th>Professors</th>
 			</tr>
@@ -14,6 +15,7 @@
 				<tr style= "background-color:{{color}}55">
 					<td>{{courseNumber}}</td>
 					<td>{{courseName}}</td>
+					<td>{{credits}}</td>
 					<td>{{#each scheduledTimes}}
 					{{day}} {{start}}-{{end}}<br>
 					{{/each}}</td>
@@ -42,4 +44,26 @@
 	  	</div>
 	  </div> 
 	</form>	
+	{{#with defaults}}
+	<form class="form-horizontal" method="GET" action="/courses/schedules/credits">
+			<div class="input-group mb-3">
+				<label class="p-2">Generate schedules by number of credits:</label>
+				<span class="input-group-text">Generate schedules with</span>
+				<input type="Number" class="form-control" placeholder="(blank for {{MIN_CREDITS}} minimum)" aria-label="minCredits" name="minCredits">
+				<span class="input-group-text">to</span>
+				<input type="Number" class="form-control" placeholder="(blank for {{MAX_CREDITS}} maximum)" aria-label="minCredits" name="maxCredits">
+				<span class="input-group-text">credits</span>
+				<button type="submit" class="btn btn-outline-dark">Generate</button>
+		</div>
+	</form>
+		<form class="form-horizontal" method="GET" action="/courses/schedules/courses">
+			<div class="input-group mb-3">
+				<label class="p-2">Generate schedules by number of classes:</label>
+				<span class="input-group-text">Generate schedules with</span>
+				<input type="Number" class="form-control" placeholder="(blank for {{NUM_COURSES}} classes)" aria-label="minCredits" name="numCourses">
+				<span class="input-group-text">classes</span>
+				<button type="submit" class="btn btn-outline-dark">Generate</button>
+		</div>
+	</form>
+	{{/with}}
 </div>

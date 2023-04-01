@@ -5,6 +5,9 @@ import { fileURLToPath } from 'url';
 import './models/course.mjs';
 import { makeTimeTable, makeNonconflictingSchedules } from './courseConstruction.mjs';
 
+// Default values based on a typical NYU student
+const NUM_COURSES = 4, MIN_CREDITS = 16, MAX_CREDITS = 18;
+
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -14,7 +17,6 @@ const Course = mongoose.model('Course');
 app.set('view engine', 'hbs');
 app.listen(process.env.PORT || 3000);
 
-app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended:false }));
 
 app.get('/', (req, res) => {
@@ -23,16 +25,38 @@ app.get('/', (req, res) => {
 
 app.get('/courses', async (req, res) => {
 	const courses = await Course.find();
-	res.render('course-list', { courses });
+	res.render('course-list', { courses, defaults: { NUM_COURSES, MIN_CREDITS, MAX_CREDITS } });
 });
 
 app.get('/courses/add', (req, res) => {
 	res.render('add-course');
 });
 
-app.get('/courses/schedules', async (req, res) => {
-	const timeTable = makeTimeTable(await Course.find());
-	res.render('schedules', { timeTable });
+app.get('/courses/schedules/:method', async (req, res) => {
+	const queryData = [];
+
+	if(req.params.method === 'credits') queryData.push(+req.query.minCredits || MIN_CREDITS, +req.query.maxCredits || MAX_CREDITS);
+	else if(req.params.method === 'courses') queryData.push(+req.query.numCourses || NUM_COURSES);
+
+	const rawSchedules = makeNonconflictingSchedules(await Course.find(), req.params.method, queryData);
+	const timeTables = rawSchedules.map((schedule => {
+		const tableData = {
+			numCredits: schedule.reduce((acc, course) => {
+				acc += course.credits;
+				return acc;
+			}, 0),
+			numCourses: schedule.length,
+			data: makeTimeTable(schedule),
+		};
+		return tableData;
+	}));
+
+	let titleMessage;
+	if(timeTables.length === 0) titleMessage = 'No valid schedules with ';
+	else titleMessage = 'Filtered by schedules with ';
+	titleMessage += `${req.params.method === 'credits' ? `${req.query.minCredits || MIN_CREDITS}-${req.query.maxCredits || MAX_CREDITS} credits` : `${req.query.numCourses || NUM_COURSES} courses`}!`;
+
+	res.render('schedules', { numSchedules: timeTables.length > 0 ? timeTables.length : undefined, titleMessage, timeTables });
 });
 
 app.post('/courses/add', async (req, res) => {
@@ -82,6 +106,7 @@ app.post('/courses/add', async (req, res) => {
 
 		const newCourse = new Course(newCourseData);
 		await newCourse.save();
+
 		res.redirect('/courses');
 	}catch(err){
 		res.status(400).send('Invalid Input! Field missing or format was bad!');
@@ -90,5 +115,6 @@ app.post('/courses/add', async (req, res) => {
 
 app.post('/courses/remove', async (req, res) => {
 	if(req.body.courseToRemove !== '') await Course.deleteOne({ _id: req.body.courseToRemove });
+
 	res.redirect('/courses');
 });
