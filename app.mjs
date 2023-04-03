@@ -15,7 +15,7 @@ const __dirname = path.dirname(__filename);
 const Course = mongoose.model('Course');
 
 app.set('view engine', 'hbs');
-app.listen(process.env.PORT || 3000);
+app.listen(process.env.PORT ?? 3000);
 
 app.use(express.urlencoded({ extended:false }));
 

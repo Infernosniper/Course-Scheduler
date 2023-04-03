@@ -1,12 +1,34 @@
+import fs from 'fs';
+import path from 'path';
+import url from 'url';
 import mongoose from 'mongoose';
 const { Schema } = mongoose;
+
+const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 
 const mongooseOpts = {
 	useNewUrlParser: true,
 	useUnifiedTopology: true,
 };
 
-await mongoose.connect('mongodb://localhost/final-project', mongooseOpts)
+// is the environment variable, NODE_ENV, set to PRODUCTION?
+let dbconf;
+if (process.env.NODE_ENV === 'PRODUCTION') {
+	// if we're in PRODUCTION mode, then read the configration from a file
+	// use blocking file io to do this...
+	const fn = path.join(__dirname, '..', 'config.json');
+	const data = fs.readFileSync(fn);
+
+	// our configuration file will be in json, so parse it and set the
+	// conenction string appropriately!
+	const conf = JSON.parse(data);
+	dbconf = conf.dbconf;
+} else {
+	// if we're not in PRODUCTION mode, then use
+	dbconf = 'mongodb://localhost/final-project';
+}
+
+await mongoose.connect(dbconf, mongooseOpts)
 	.then(() => console.log('connected to database'))
 	.catch((err) => console.error(err));
 
