@@ -4,31 +4,31 @@
 		<div class="row g-3 align-items-center p-2">
 			<label class="control-label col-sm-1" for="courseNumber">Course Number:</label>
 			<div class="col-sm-7">
-		    	<input type="text" class="form-control" id="courseNumber" name= "courseNumber" placeholder="e.g., 'CHEM-UA 225'">
+		    	<input type="text" class="form-control" id="courseNumber" name= "courseNumber" placeholder="e.g., 'CHEM-UA 225'" required pattern="^[A-Z]+-[A-Z]+\s[0-9]+$" data-bouncer-message="Must be in format 'COURSE-LEVEL ####' (e.x. 'CHEM-UA 225')">
 			</div>
 		</div>
 		<div class="row g-3 align-items-center p-2">
 			<label class="control-label col-sm-1" for="courseName">Course Name:</label>
 			<div class="col-sm-7">
-		    	<input type="text" class="form-control" id="courseName" name= "courseName" placeholder="e.g., 'Organic Chemistry I & Laboratory'">
+		    	<input type="text" class="form-control" id="courseName" name= "courseName" placeholder="e.g., 'Organic Chemistry I & Laboratory'" required>
 		    </div>
 		</div>
 		<div class="row g-3 align-items-center p-2">
 			<label class="control-label col-sm-1" for="credits">Credits:</label>
 			<div class="col-sm-7">
-		    	<input type="Number" class="form-control" id="credits" name= "credits" placeholder="e.g., 5">
+		    	<input type="Number" class="form-control" id="credits" name= "credits" placeholder="e.g., 5" required min="0">
 		    </div>
 		</div>
 		<div class="row g-3 align-items-center p-2">
 			<label class="control-label col-sm-1" for="scheduledTimes">Scheduled Times:</label>
 			<div class="col-sm-7">
-		    	<input type="text" class="form-control" id="scheduledTimes" name= "scheduledTimes" placeholder="e.g., 'Mon 0930-1045, Wed 0930-1045, Thu 1230-1345'">
+		    	<input type="text" class="form-control" id="scheduledTimes" name= "scheduledTimes" placeholder="e.g., 'Mon 0930-1045, Wed 0930-1045, Thu 1230-1345'" required pattern="^(?:(?:(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)\s(?:(?:0[0-9]|1[0-9]|2[0-3])[0-5][0-9]-(?:0[0-9]|1[0-9]|2[0-3])[0-5][0-9]))+,\s)*(?:(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)\s(?:(?:0[0-9]|1[0-9]|2[0-3])[0-5][0-9]-(0[0-9]|1[0-9]|2[0-3])[0-5][0-9]))+$" data-bouncer-message="Must be in the format 'Day HHMM-HHMM, Day HHMM-HHMM...' (e.x. 'Mon 0800-0915' or 'Tue 1400-1515, Thu 1400-1515')">
 		    </div>
 		</div>
 		<div class="row g-3 align-items-center p-2">
 			<label class="control-label col-sm-1" for="professors">Professors:</label>
 			<div class="col-sm-7">
-		    	<input type="text" class="form-control" id="professors" name= "professors" placeholder="e.g., 'Angelo (4.9), John Henssler'">
+		    	<input type="text" class="form-control" id="professors" name= "professors" placeholder="e.g., 'Angelo (4.9), John Henssler'" required pattern="^(?:([A-Za-z])+(?:\s(?:[A-Za-z])+)*(?:\s\((?:[0-4]\.[0-9]|5\.0)\))*,\s)*(?:([A-Za-z])+(?:\s(?:[A-Za-z])+)*(?:\s\((?:[0-4]\.[0-9]|5\.0)\))*)+$" data-bouncer-message="Must minimally contain a name. Optionally can include a first and last name, as well as RMP score in X.X format. (e.x. 'First Last (4.4), First Last (5.0)...' or 'Last, Last (1.0)...')">
 		    </div>
 		</div>
 		<div class="row g-3 align-items-center p-2">

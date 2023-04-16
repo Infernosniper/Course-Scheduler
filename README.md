@@ -82,6 +82,7 @@ An Example Course with Embedded Items:
     * I'm going to be using passport for user authentication
 * (3 points) Perform client side form validation using a JavaScript library
     * If you put in a number that's in an invalid format (such as bad time slot format, bad course name format), a message will appear in the DOM
+    * Also involves learning REGEX for ensuring data follows the predetermined patterns
 * (2 point) Use Bootstrap as a CSS Framework
     * Will configure a theme using Bootstrap to make the website hurt the user's brain a little bit less
 * (5 points) NYU Course System API

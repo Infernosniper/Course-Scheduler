@@ -18,6 +18,7 @@ app.set('view engine', 'hbs');
 app.listen(process.env.PORT ?? 3000);
 
 app.use(express.urlencoded({ extended:false }));
+app.use(express.static('public'));
 
 app.get('/', (req, res) => {
 	res.redirect('/courses');
