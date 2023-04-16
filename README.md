@@ -14,7 +14,7 @@ The application will store Users, Courses, scheduled times, and Professors
 
 * users can have many courses (via reference)
 * courses can have multiple time blocks (by embedding)
-* courses can have multiple proessors (by reference)
+* courses can have multiple proessors (by embedding)
 
 An Example User:
 
@@ -39,25 +39,27 @@ An Example Course with Embedded Items:
     ],
     Professors: [
         {first: "Joe", last: "Versoza", rating: 3.5}
-    ]
+    ],
+    mandatory: true, // Thank you to the grader who recommended I include this in my schema
+    color: #FFFFFF,
 }
 ```
 
-## [Link to Commented First Draft Schema](models/course.mjs) 
+## [Link to Schema](models/course.mjs) 
 
 ## Wireframes
 
+/courses - page for showing the courses in registry
+
+![list create](documentation/view-courses.png)
+
 /courses/add - page for creating a new shopping list
 
-![list create](documentation/add-course.jpeg)
+![list](documentation/add-course.png)
 
-/courses - page for showing all courses
+/courses/schedules - page for viewing schedules based on registry
 
-![list](documentation/view-courses.jpeg)
-
-/courses/remove - page for selecting course to remove
-
-![list](documentation/remove-course.jpeg)
+![list](documentation/generated-schedules.png)
 
 ## Site Map
 
@@ -78,9 +80,9 @@ An Example Course with Embedded Items:
 
 * (5 points) Integrate user authentication
     * I'm going to be using passport for user authentication
-* (4 points) Perform client side form validation using a JavaScript library
+* (3 points) Perform client side form validation using a JavaScript library
     * If you put in a number that's in an invalid format (such as bad time slot format, bad course name format), a message will appear in the DOM
-* (1 point) Use Bootstrap as a CSS Framework
+* (2 point) Use Bootstrap as a CSS Framework
     * Will configure a theme using Bootstrap to make the website hurt the user's brain a little bit less
 * (5 points) NYU Course System API
     * This one is a long shot for if I happen to get the rest of the project done
@@ -93,4 +95,5 @@ An Example Course with Embedded Items:
 ## Annotations / References Used
 
 1. [Bootstrap documentation: my best friend](https://getbootstrap.com/docs/5.3/getting-started/introduction/) - [course-list.hbs](views/course-list.hbs), [add-course.hbs](views/add-course.hbs),  [schedules.hbs](views/schedules.hbs) 
+2. [Bouncer.js for client-side form validation](https://github.com/cferdinandi/bouncer) - [layout.hbs](views/layout.hbs) [add-course.hbs](views/add-course.hbs)
 
