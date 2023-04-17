@@ -60,6 +60,10 @@ app.get('/courses/schedules/:method', async (req, res) => {
 	res.render('schedules', { numSchedules: timeTables.length > 0 ? timeTables.length : undefined, titleMessage, timeTables });
 });
 
+app.get('/courses/edit', (req, res) => {
+	res.send("TO BE IMPLEMENTED");
+});
+
 app.post('/courses/add', async (req, res) => {
 	try{
 		const scheduledTimes = req.body.scheduledTimes.split(', ').map(time => {

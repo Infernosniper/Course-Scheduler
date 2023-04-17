@@ -8,6 +8,8 @@
 				<th>Credits</th>
 				<th>Scheduled Times</th>
 				<th>Professors</th>
+				<th>Mandatory?</th>
+				<th>Edit?</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -22,6 +24,17 @@
 					<td>{{#each professors}}
 					{{first}} {{last}} {{#if rating}}({{rating}} &#11088){{/if}}<br>
 					{{/each}}</td>
+					<td>
+						<div class="form-check">
+							<input class="form-check-input" type="checkbox" disabled {{#if mandatory}}checked{{/if}}>
+						</div>
+					</td>
+					<td>
+						<form class="form-horizontal" method="GET" action="/courses/edit">
+							<input type="hidden" name="courseID" value="{{_id}}">
+							<button type="submit"><i class="fa fa-pen-to-square"></i></button>
+						</form>
+					</td>
 				</tr>
 			{{/each}}
 		</tbody>

@@ -95,6 +95,7 @@ An Example Course with Embedded Items:
 
 ## Annotations / References Used
 
-1. [Bootstrap documentation: my best friend](https://getbootstrap.com/docs/5.3/getting-started/introduction/) - [course-list.hbs](views/course-list.hbs), [add-course.hbs](views/add-course.hbs),  [schedules.hbs](views/schedules.hbs) 
-2. [Bouncer.js for client-side form validation](https://github.com/cferdinandi/bouncer) - [layout.hbs](views/layout.hbs) [add-course.hbs](views/add-course.hbs)
+1. [Bootstrap documentation: my best friend](https://getbootstrap.com/docs/5.3/getting-started/introduction/) - [layout.hbs](views/layout.hbs), [course-list.hbs](views/course-list.hbs), [add-course.hbs](views/add-course.hbs),  [schedules.hbs](views/schedules.hbs) 
+2. [Bouncer.js for client-side form validation](https://github.com/cferdinandi/bouncer) - [layout.hbs](views/layout.hbs), [add-course.hbs](views/add-course.hbs)
+3. [Font Awesome Icons](https://fontawesome.com/) - [layour.hbs](views/layout.hbs), [course-list.hbs](views/course-list.hbs)
 
