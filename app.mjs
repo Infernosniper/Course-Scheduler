@@ -1,7 +1,10 @@
-import express from 'express';
 import path from 'path';
-import mongoose from 'mongoose';
 import { fileURLToPath } from 'url';
+import express from 'express';
+import session from 'express-session';
+import mongoose from 'mongoose';
+import passport from 'passport';
+import connectEnsureLogin from 'connect-ensure-login';
 import './models/course.mjs';
 import { makeTimeTable, makeNonconflictingSchedules } from './courseConstruction.mjs';
 
@@ -13,27 +16,56 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const Course = mongoose.model('Course');
+const User = mongoose.model('User');
 
 app.set('view engine', 'hbs');
 app.listen(process.env.PORT ?? 3000);
 
 app.use(express.urlencoded({ extended:false }));
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(session({
+	secret: 'r8q,+&1LM3)CD*zAGpx1xm{NeQhc;#',
+	resave: false,
+	saveUninitialized: true,
+	// 1 day
+	cookie: { maxAge: 24 * 60 * 60 * 1000 },
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.use(User.createStrategy());
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 app.get('/', (req, res) => {
 	res.redirect('/courses');
 });
 
-app.get('/courses', async (req, res) => {
+app.get('/login', (req, res) => {
+	const context = {};
+	if(req.session.messages !== undefined){
+		context.loginMessage = req.session.messages[0];
+		delete req.session.context;
+	}
+
+	if(req.session.badRegistration !== undefined){
+		context.registrationMessage = req.session.badRegistration;
+		delete req.session.badRegistration;
+	}
+	res.render('login', context);
+});
+
+app.get('/courses', connectEnsureLogin.ensureLoggedIn(), async (req, res) => {
 	const courses = await Course.find();
-	res.render('course-list', { courses, defaults: { NUM_COURSES, MIN_CREDITS, MAX_CREDITS } });
+	res.render('course-list', { username: req.user.username, courses, defaults: { NUM_COURSES, MIN_CREDITS, MAX_CREDITS } });
 });
 
-app.get('/courses/add', (req, res) => {
-	res.render('add-course');
+app.get('/courses/add', connectEnsureLogin.ensureLoggedIn(), (req, res) => {
+	res.render('add-course', { username: req.user.username});
 });
 
-app.get('/courses/schedules/:method', async (req, res) => {
+app.get('/courses/schedules/:method', connectEnsureLogin.ensureLoggedIn(), async (req, res) => {
 	const queryData = [];
 
 	if(req.params.method === 'credits') queryData.push(+req.query.minCredits || MIN_CREDITS, +req.query.maxCredits || MAX_CREDITS);
@@ -57,14 +89,41 @@ app.get('/courses/schedules/:method', async (req, res) => {
 	else titleMessage = 'Filtered by schedules with ';
 	titleMessage += `${req.params.method === 'credits' ? `${req.query.minCredits || MIN_CREDITS}-${req.query.maxCredits || MAX_CREDITS} credits` : `${req.query.numCourses || NUM_COURSES} courses`}!`;
 
-	res.render('schedules', { numSchedules: timeTables.length > 0 ? timeTables.length : undefined, titleMessage, timeTables });
+	res.render('schedules', { username: req.user.username, numSchedules: timeTables.length > 0 ? timeTables.length : undefined, titleMessage, timeTables });
 });
 
-app.get('/courses/edit', (req, res) => {
+app.get('/courses/edit', connectEnsureLogin.ensureLoggedIn(), (req, res) => {
 	res.send("TO BE IMPLEMENTED");
 });
 
-app.post('/courses/add', async (req, res) => {
+app.post('/login', passport.authenticate('local', { failureRedirect: '/login', failureMessage: true }), (req, res) => {
+	if(req.session.returnTo !== undefined) res.redirect(req.session.returnTo);
+	else res.redirect('/');
+});
+
+app.post('/register', (req, res) => {
+	User.register({ username: req.body.username }, req.body.password, function(err){
+		if(err){
+			req.session.badRegistration = err.message;
+			res.redirect('/login');
+		}else {
+			User.authenticate(req.body.username, req.body.password, function(err){
+				if(err) console.log(err);
+				if(req.session.returnTo !== undefined) res.redirect(req.session.returnTo);
+				else res.redirect('/');
+			});
+		}
+	});
+});
+
+app.post('/logout', connectEnsureLogin.ensureLoggedIn(), (req, res) => {
+	req.logout(function(err){
+		if(err) console.log(err);
+	});
+	res.redirect('/');
+});
+
+app.post('/courses/add', connectEnsureLogin.ensureLoggedIn(), async (req, res) => {
 	try{
 		const scheduledTimes = req.body.scheduledTimes.split(', ').map(time => {
 			const [day, times] = time.split(' ');
@@ -118,7 +177,7 @@ app.post('/courses/add', async (req, res) => {
 	}
 });
 
-app.post('/courses/remove', async (req, res) => {
+app.post('/courses/remove', connectEnsureLogin.ensureLoggedIn(), async (req, res) => {
 	if(req.body.courseToRemove !== '') await Course.deleteOne({ _id: req.body.courseToRemove });
 
 	res.redirect('/courses');

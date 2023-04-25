@@ -23,6 +23,7 @@
 		      <li class="nav-item"><a class="nav-link" href="/courses/add">Add Course</a></li>
 		    </ul>
 		  </div>
+		  {{#if username}}Logged in as {{username}} <form method="POST" action="/logout"><button type="submit" class="btn btn-outline-dark btn-lg">Logout</button></form>{{/if}}
 		</nav>
 		{{{body}}}
 		<script>

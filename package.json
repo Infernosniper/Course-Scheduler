@@ -17,8 +17,12 @@
   },
   "homepage": "https://github.com/nyu-csci-ua-0467-001-002-spring-2023/final-project-Infernosniper#readme",
   "dependencies": {
+    "connect-ensure-login": "^0.1.1",
     "express": "^4.18.2",
+    "express-session": "^1.17.3",
     "hbs": "^4.2.0",
-    "mongoose": "^7.0.3"
+    "mongoose": "^7.0.3",
+    "passport": "^0.6.0",
+    "passport-local-mongoose": "^8.0.0"
   }
 }

@@ -2,6 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import url from 'url';
 import mongoose from 'mongoose';
+import passportLocalMongoose from 'passport-local-mongoose';
+
 const { Schema } = mongoose;
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
@@ -65,6 +67,15 @@ const courseSchema = new Schema({
 	color: { type: String, required: true },
 });
 
-mongoose.model('Course', courseSchema);
+// Schema for User
 
-export default courseSchema;
+const userSchema = new Schema({
+	username: { type: String, required: true },
+	hash: { type: String, required: true },
+	courses: { type: [{ type: Schema.Types.ObjectId, ref: 'Course' }] },
+});
+
+userSchema.plugin(passportLocalMongoose);
+
+mongoose.model('Course', courseSchema);
+mongoose.model('User', userSchema);
