@@ -102,13 +102,13 @@ app.post('/login', passport.authenticate('local', { failureRedirect: '/login', f
 });
 
 app.post('/register', (req, res) => {
-	User.register({ username: req.body.username }, req.body.password, function(err){
+	User.register({ username: req.body.username }, req.body.password, async function(err){
 		if(err){
 			req.session.badRegistration = err.message;
 			res.redirect('/login');
 		}else {
-			User.authenticate(req.body.username, req.body.password, function(err){
-				if(err) console.log(err);
+			const newUser = await User.findOne({ username: req.body.username });
+			req.login(newUser, () => {
 				if(req.session.returnTo !== undefined) res.redirect(req.session.returnTo);
 				else res.redirect('/');
 			});
@@ -117,10 +117,9 @@ app.post('/register', (req, res) => {
 });
 
 app.post('/logout', connectEnsureLogin.ensureLoggedIn(), (req, res) => {
-	req.logout(function(err){
-		if(err) console.log(err);
+	req.logout(() => {
+		res.redirect('/');
 	});
-	res.redirect('/');
 });
 
 app.post('/courses/add', connectEnsureLogin.ensureLoggedIn(), async (req, res) => {
