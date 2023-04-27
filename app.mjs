@@ -57,12 +57,12 @@ app.get('/login', (req, res) => {
 });
 
 app.get('/courses', connectEnsureLogin.ensureLoggedIn(), async (req, res) => {
-	const courses = await Course.find();
+	const courses = await Course.find({ slug: { $in: req.user.courses } });
 	res.render('course-list', { username: req.user.username, courses, defaults: { NUM_COURSES, MIN_CREDITS, MAX_CREDITS } });
 });
 
 app.get('/courses/add', connectEnsureLogin.ensureLoggedIn(), (req, res) => {
-	res.render('add-course', { username: req.user.username});
+	res.render('add-course', { username: req.user.username });
 });
 
 app.get('/courses/schedules/:method', connectEnsureLogin.ensureLoggedIn(), async (req, res) => {
@@ -71,7 +71,7 @@ app.get('/courses/schedules/:method', connectEnsureLogin.ensureLoggedIn(), async
 	if(req.params.method === 'credits') queryData.push(+req.query.minCredits || MIN_CREDITS, +req.query.maxCredits || MAX_CREDITS);
 	else if(req.params.method === 'courses') queryData.push(+req.query.numCourses || NUM_COURSES);
 
-	const rawSchedules = makeNonconflictingSchedules(await Course.find(), req.params.method, queryData);
+	const rawSchedules = makeNonconflictingSchedules(await Course.find({ slug: { $in: req.user.courses } }), req.params.method, queryData);
 	const timeTables = rawSchedules.map((schedule => {
 		const tableData = {
 			numCredits: schedule.reduce((acc, course) => {
@@ -92,13 +92,14 @@ app.get('/courses/schedules/:method', connectEnsureLogin.ensureLoggedIn(), async
 	res.render('schedules', { username: req.user.username, numSchedules: timeTables.length > 0 ? timeTables.length : undefined, titleMessage, timeTables });
 });
 
-app.get('/courses/edit', connectEnsureLogin.ensureLoggedIn(), (req, res) => {
-	res.send("TO BE IMPLEMENTED");
+app.get('/courses/edit', connectEnsureLogin.ensureLoggedIn(), async (req, res) => {
+	// Check if user 'owns' the course or if they are trying to access unauthorized course via url
+	if((await Course.findOne({ slug: req.query.slug })) === null) res.redirect('/');
+	else res.send('TO BE IMPLEMENTED');
 });
 
 app.post('/login', passport.authenticate('local', { failureRedirect: '/login', failureMessage: true }), (req, res) => {
-	if(req.session.returnTo !== undefined) res.redirect(req.session.returnTo);
-	else res.redirect('/');
+	res.redirect('/');
 });
 
 app.post('/register', (req, res) => {
@@ -109,8 +110,7 @@ app.post('/register', (req, res) => {
 		}else {
 			const newUser = await User.findOne({ username: req.body.username });
 			req.login(newUser, () => {
-				if(req.session.returnTo !== undefined) res.redirect(req.session.returnTo);
-				else res.redirect('/');
+				res.redirect('/');
 			});
 		}
 	});
@@ -168,7 +168,11 @@ app.post('/courses/add', connectEnsureLogin.ensureLoggedIn(), async (req, res) =
 		};
 
 		const newCourse = new Course(newCourseData);
-		await newCourse.save();
+		await newCourse.save()
+			.then(async c => {
+				req.user.courses.push(c.slug);
+				await req.user.save();
+			});
 
 		res.redirect('/courses');
 	}catch(err){
@@ -177,7 +181,8 @@ app.post('/courses/add', connectEnsureLogin.ensureLoggedIn(), async (req, res) =
 });
 
 app.post('/courses/remove', connectEnsureLogin.ensureLoggedIn(), async (req, res) => {
-	if(req.body.courseToRemove !== '') await Course.deleteOne({ _id: req.body.courseToRemove });
-
+	req.user.courses.splice(req.user.courses.indexOf(req.body.courseToRemove), 1);
+	await req.user.save();
+	await Course.deleteOne({ slug: req.body.courseToRemove });
 	res.redirect('/courses');
 });

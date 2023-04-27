@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import url from 'url';
 import mongoose from 'mongoose';
+import slug from 'mongoose-slug-updater';
 import passportLocalMongoose from 'passport-local-mongoose';
 
 const { Schema } = mongoose;
@@ -34,6 +35,8 @@ await mongoose.connect(dbconf, mongooseOpts)
 	.then(() => console.log('connected to database'))
 	.catch((err) => console.error(err));
 
+mongoose.plugin(slug);
+
 // scheduledTime contains the day of week, start time, and end time
 const scheduledTimeSchema = new Schema({
 	day: { type: String, enum: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], required: true },
@@ -65,6 +68,12 @@ const courseSchema = new Schema({
 	professors: { type: [professorsSchema], required: true },
 	mandatory: { type: Boolean, required: true },
 	color: { type: String, required: true },
+	slug: {
+		type: String,
+		slug: ['courseNumber', 'courseName'],
+		unique: true,
+		slugPaddingSize: 4,
+	},
 });
 
 // Schema for User
@@ -72,7 +81,7 @@ const courseSchema = new Schema({
 const userSchema = new Schema({
 	username: { type: String, required: true },
 	hash: { type: String, required: true },
-	courses: { type: [{ type: Schema.Types.ObjectId, ref: 'Course' }] },
+	courses: { type: [String] },
 });
 
 userSchema.plugin(passportLocalMongoose);

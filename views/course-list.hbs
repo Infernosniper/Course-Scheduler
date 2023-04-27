@@ -8,8 +8,8 @@
 				<th>Credits</th>
 				<th>Scheduled Times</th>
 				<th>Professors</th>
-				<th>Mandatory?</th>
-				<th>Edit?</th>
+				<th>Mandatory</th>
+				<th>Modify?</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -30,33 +30,21 @@
 						</div>
 					</td>
 					<td>
-						<form class="form-horizontal" method="GET" action="/courses/edit">
-							<input type="hidden" name="courseID" value="{{_id}}">
-							<button type="submit"><i class="fa fa-pen-to-square"></i></button>
-						</form>
+						<div class="d-flex">
+							<form class="form-horizontal" method="GET" action="/courses/edit">
+								<input type="hidden" name="slug" value="{{slug}}">
+								<button type="submit"><i class="fa fa-pen-to-square"></i></button>
+							</form>
+							<form class="form-horizontal mx-1" method="POST" action="/courses/remove">
+								<input type="hidden" name="courseToRemove" value="{{slug}}">
+								<button type="submit"><i class="fa fa-trash"></i></button>
+							</form>
+						</div>
 					</td>
 				</tr>
 			{{/each}}
 		</tbody>
 	</table>
-	<form class="form-horizontal" method="POST" action="/courses/remove">
-	  <div class="row g-3 align-items-center p-2">
-	  	<div class="col-auto">
-	    	<label for="sel1">Select course to remove from registry:</label>
-	  	</div>
-	  	<div class="col-auto">
-		    <select class="form-select" id="sel1" name="courseToRemove">
-		    	<option hidden value="">Select Course</option>
-		      {{#each courses}}
-		        <option value="{{_id}}">{{courseNumber}}: {{courseName}}</option>
-		      {{/each}}
-		    </select>
-	  	</div>
-	  	<div class="col-auto">
-	    	<button type="submit" class="btn btn-outline-dark">Remove</button>
-	  	</div>
-	  </div> 
-	</form>	
 	{{#with defaults}}
 	<form class="form-horizontal" method="GET" action="/courses/schedules/credits">
 			<div class="input-group mb-3">

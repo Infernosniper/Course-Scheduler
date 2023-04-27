@@ -25,6 +25,7 @@
 		  </div>
 		  {{#if username}}Logged in as {{username}} <form method="POST" action="/logout"><button type="submit" class="btn btn-outline-dark btn-lg">Logout</button></form>{{/if}}
 		</nav>
+		<p class="important text-center">Currently, the "mandatory" and "edit" functions are work in progress! All other features work as intended.</p>
 		{{{body}}}
 		<script>
 			const validate = new Bouncer('form');

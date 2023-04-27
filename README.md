@@ -22,7 +22,7 @@ An Example User:
 {
   username: "michael",
   hash: // a password hash,
-  courses: // an array of references to Course documents
+  courses: ["CSCI-UA-0460-Applied-Internet-Technology"]
 }
 ```
 
@@ -40,8 +40,9 @@ An Example Course with Embedded Items:
     Professors: [
         {first: "Joe", last: "Versoza", rating: 3.5}
     ],
-    mandatory: true, // Thank you to the grader who recommended I include this in my schema
+    mandatory: true,
     color: #FFFFFF,
+    slug: "CSCI-UA-0460-Applied-Internet-Technology"
 }
 ```
 
@@ -72,9 +73,9 @@ An Example Course with Embedded Items:
 3. as a user, I can view currently added courses
 4. as a user, I can add courses to the registry
 5. as a user, I can remove courses from the registry
-6. as a user, I can assign priority to courses
-7. as a user, I can generate potential schedules based on selected courses
-8. as a user, I can export generated schedules
+6. as a user, I can edit courses in the registry
+7. as a user, I can assign priority to courses
+8. as a user, I can generate potential schedules based on selected courses, number of credits, or number of courses
 
 ## Research Topics
 
@@ -85,11 +86,8 @@ An Example Course with Embedded Items:
     * Also involves learning REGEX for ensuring data follows the predetermined patterns
 * (2 point) Use Bootstrap as a CSS Framework
     * Will configure a theme using Bootstrap to make the website hurt the user's brain a little bit less
-* (5 points) NYU Course System API
-    * This one is a long shot for if I happen to get the rest of the project done
-    * Addition of this feature would support adding courses to registry via the NYU Course ID, and the necessary data fields would be pulled from the NYU Course System API
 
-15 points total out of 10 required points
+10 points total out of 10 required points
 
 ## [Link to Initial Main Project File](app.mjs) 
 
